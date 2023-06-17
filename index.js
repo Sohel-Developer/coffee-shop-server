@@ -38,47 +38,59 @@ async function run() {
 
         const coffeeCollection = client.db("coffeeDB").collection("coffees");
 
-        app.get('/coffee', async (req, res) => {
-            const query = {};
 
-            const result = await coffeeCollection.find(query).toArray();
+        app.get('/coffee', async (req, res) => {
+            const result = await coffeeCollection.find().toArray();
             res.send(result)
         })
 
 
         app.get('/coffee/:id', async (req, res) => {
             const id = req.params.id;
-
             const query = { _id: new ObjectId(id) };
             const result = await coffeeCollection.findOne(query);
 
             res.send(result)
         })
 
+        app.post('/coffee', async (req, res) => {
+            const data = req.body;
+            const result = await coffeeCollection.insertOne(data);
+            res.send(result)
+        })
+
+        app.put('/coffee/:id', async (req, res) => {
+            const id = req.params.id;
+            const data = req.body;
+
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+
+            const updateDoc = {
+                $set: {
+                    name: data.name,
+                    chef: data.chef,
+                    supplier: data.supplier,
+                    taste: data.taste,
+                    category: data.category,
+                    details: data.details,
+                    img: data.img,
+                    price: data.price,
+                },
+            };
+
+
+            const result = await coffeeCollection.updateOne(filter, updateDoc, options);
+            res.send(result)
+        })
+
         app.delete('/coffee/:id', async (req, res) => {
             const id = req.params.id;
-
             const query = { _id: new ObjectId(id) };
             const result = await coffeeCollection.deleteOne(query);
 
             res.send(result)
         })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
